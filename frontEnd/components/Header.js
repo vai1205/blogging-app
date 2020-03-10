@@ -29,7 +29,7 @@ const Header = props => {
           <Nav className="mr-auto" navbar>
             <NavItem>
               <Link href="/signin">
-                <NavLink>Sign In</NavLink>
+                <NavLink className="pointer">Sign In</NavLink>
               </Link>
             </NavItem>
             <NavItem>
@@ -38,7 +38,7 @@ const Header = props => {
               </Link>
             </NavItem>
           </Nav>
-          <NavbarText>Simple Text</NavbarText>
+          <NavbarText>Welcome to Blogs!!</NavbarText>
         </Collapse>
       </Navbar>
     </div>
