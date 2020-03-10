@@ -70,7 +70,7 @@ const SignUpComponent = () => {
             placeholder="Enter Your Password"
           />
         </div>
-        <div>
+        <div className="form-group text-center">
           <button type="submit" className="btn btn-primary">
             Sign Up
           </button>

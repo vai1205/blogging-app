@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { signin } from "../../actions/auth";
+import { signin, authenticate } from "../../actions/auth";
 import Router from "next/router";
 const SignInComponent = () => {
   const [values, setValues] = useState({
@@ -22,10 +22,7 @@ const SignInComponent = () => {
       if (resp.error) {
         setValues({ ...values, error: resp.error, loading: false });
       } else {
-        // save user token to cookie
-        // save user info to localStorage
-        // authenticate user
-        Router.push("/");
+        authenticate(resp, () => Router.push("/"));
       }
     });
   };
@@ -56,9 +53,9 @@ const SignInComponent = () => {
             placeholder="Enter Your Password"
           />
         </div>
-        <div>
+        <div className="form-group text-center">
           <button type="submit" className="btn btn-primary">
-            Sign Up
+            Sign In
           </button>
         </div>
       </form>
