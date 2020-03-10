@@ -1,9 +1,9 @@
 import Layout from "../components/Layout";
-const Index = () => {
+const SignUp = () => {
   return (
     <Layout>
-      <h2>Index Page</h2>
+      <h2>Sign Up Page</h2>
     </Layout>
   );
 };
-export default Index;
+export default SignUp;
