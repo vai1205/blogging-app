@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Router from "next/router";
+import NProgress from "nprogress";
 import { APP_NAME } from "../config";
 import { isAuth, signout } from "../actions/auth";
 import {
@@ -17,6 +18,11 @@ import {
   DropdownItem,
   NavbarText
 } from "reactstrap";
+
+Router.onRouteChangeStart = url => NProgress.start();
+Router.onRouteChangeComplete = url => NProgress.done();
+Router.onRouteChangeError = url => NProgress.done();
+
 const Header = props => {
   const [isOpen, setIsOpen] = useState(false);
   const toggle = () => setIsOpen(!isOpen);
@@ -58,8 +64,9 @@ const Header = props => {
           </Nav>
           {isAuth() ? (
             <React.Fragment>
-              {!(Router.pathname === "/user" ||
-                Router.pathname === "/admin") && (
+              {!(
+                Router.pathname === "/user" || Router.pathname === "/admin"
+              ) && (
                 <NavLink
                   onClick={handleDashboardRedirect}
                   style={{ cursor: "pointer" }}
@@ -79,4 +86,5 @@ const Header = props => {
     </div>
   );
 };
+
 export default Header;
