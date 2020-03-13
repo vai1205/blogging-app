@@ -25,7 +25,13 @@ const SignInComponent = () => {
       if (resp.error) {
         setValues({ ...values, error: resp.error, loading: false });
       } else {
-        authenticate(resp, () => Router.push("/"));
+        authenticate(resp, () => {
+          if(isAuth() && isAuth().role ===1){
+            Router.push("/admin")
+          }else{
+            Router.push("/user")
+          }
+        });
       }
     });
   };

@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: Number,
-      trim: true
+      default: 0 // 0 user role for normal users and 1 for admin
     },
     photo: {
       type: Buffer,

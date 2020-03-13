@@ -38,7 +38,6 @@ exports.signin = (req, res) => {
       });
     }
     //authenticate
-    console.log(user.authenticate);
     if (!user.authenticate(password)) {
       return res.status(400).json({
         error: "Email and Password does not match."
@@ -65,3 +64,33 @@ exports.signout = (req, res) => {
 exports.requireSignIn = expressJwt({
   secret: process.env.JWT_SECRET
 });
+exports.authMiddleWare = (req, res, next) => {
+  const authUserId = req.user._id;
+  User.findById({ _id: authUserId }).exec((err, user) => {
+    if (err || !user) {
+      res.status(400).json({
+        error: "User not found!"
+      });
+    }
+    req.profile = user;
+    next();
+  });
+};
+exports.adminMiddleWare = (req, res, next) => {
+  const authAdminUserId = req.user._id;
+  User.findById({ _id: authAdminUserId }).exec((err, user) => {
+    if (err || !user) {
+      return res.status(400).json({
+        error: "User not found!"
+      });
+    }
+    if (user.role !== 1) {
+      //role = 0 for normal user and 1 for admin
+      return res.status(400).json({
+        error: "Admin Resource. Access Denied!"
+      });
+    }
+    req.profile = user;
+    next();
+  });
+};

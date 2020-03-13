@@ -23,11 +23,20 @@ const Header = props => {
   const handleSignOut = () => {
     signout(() => Router.push("/signin"));
   };
+  const handleDashboardRedirect = () => {
+    if (isAuth().role === 1) {
+      Router.push("/admin");
+    } else {
+      Router.push("/user");
+    }
+  };
   return (
     <div>
       <Navbar color="light" light expand="md">
         <Link href="/">
-          <NavLink style={{ cursor: "pointer" }} className="font-weight-bold">{APP_NAME}</NavLink>
+          <NavLink style={{ cursor: "pointer" }} className="font-weight-bold">
+            {APP_NAME}
+          </NavLink>
         </Link>
         <NavbarToggler onClick={toggle} />
         <Collapse isOpen={isOpen} navbar>
@@ -48,9 +57,20 @@ const Header = props => {
             )}
           </Nav>
           {isAuth() ? (
-            <NavLink style={{ cursor: "pointer" }} onClick={handleSignOut}>
-              Sign Out
-            </NavLink>
+            <React.Fragment>
+              {!(Router.pathname === "/user" ||
+                Router.pathname === "/admin") && (
+                <NavLink
+                  onClick={handleDashboardRedirect}
+                  style={{ cursor: "pointer" }}
+                >
+                  {isAuth().name}'s Dashboard
+                </NavLink>
+              )}
+              <NavLink style={{ cursor: "pointer" }} onClick={handleSignOut}>
+                Sign Out
+              </NavLink>
+            </React.Fragment>
           ) : (
             <NavbarText>Welcome Guest!!</NavbarText>
           )}
