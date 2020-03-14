@@ -22,7 +22,7 @@ const SignInComponent = () => {
     setValues({ ...values, loading: true, showForm: false, error: false });
     const user = { email, password };
     signin(user).then(resp => {
-      if (resp.error) {
+      if (resp && resp.error) {
         setValues({ ...values, error: resp.error, loading: false });
       } else {
         authenticate(resp, () => {

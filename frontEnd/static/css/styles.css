@@ -1,0 +1,9 @@
+#nprogress .bar{
+    height: 3px !important;
+}
+*{
+    padding: 3px;
+}
+.green{
+    color: green;
+}

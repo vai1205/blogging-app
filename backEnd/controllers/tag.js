@@ -1,6 +1,6 @@
 const Tag = require("../models/tag");
 const slugify = require("slugify");
-const errorHandler = require("../helpers/dbErrorHandler");
+const {errorHandler} = require("../helpers/dbErrorHandler");
 exports.create = (req, res) => {
   const { name } = req.body;
   let slug = slugify(name).toLowerCase();
@@ -25,6 +25,7 @@ exports.list = (req, res) => {
   });
 };
 exports.read = (req, res) => {
+  console.log("--------------------------")
   let slug = req.params.slug.toLowerCase();
   Tag.findOne({ slug }).exec((err, tag) => {
     if (err) {
