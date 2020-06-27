@@ -10,7 +10,7 @@ const _ = require("lodash");
 const stripHtml = require("string-strip-html");
 
 exports.create = (req, res) => {
-  let form = new formidable.IncomingForm();
+  let form = new formidable.IncomingForm(); //to collect all the form data and put it in a variable
   form.keepExtensions = true;
   form.parse(req, (err, fields, files) => {
     if (err) {
@@ -50,7 +50,7 @@ exports.create = (req, res) => {
     let arrayOfCategories = categories && categories.split(",");
     let arrayOfTags = tags && tags.split(",");
     if (files.photo) {
-      if (files.photo.size > 10000000) {
+      if (files.photo.size > 10000000) { 
         return res.status(400).json({
           error: "Image size should be less than 1MB"
         });
@@ -92,3 +92,157 @@ exports.create = (req, res) => {
     });
   });
 };
+
+// in second parameter of populate method, just pass the properties that are to be taken from the model in first /////parameter
+exports.list = (req, res) => {
+  Blog.find({})
+    .populate('categories', '_id name slug')  
+    .populate('tags', '_id name slug')
+    .populate('postedBy', '_id name userName')
+    .select('_id title slug excerpt categories tags postedBy createdAt updatedAt') // to deselect .select('-photo')
+    .exec((err, data) => {
+      if (err) {
+        return res.json({ error: errorHandler(err) });
+      }
+      res.json(data);
+    })
+};
+
+// this api route provide blogs with all categories and tags that is good for SEO
+exports.listAllBlogsCategoriesTags = (req, res) => {
+  let limit = req.body.limit ? parseInt(req.body.limit) : 10;
+  let skip = req.body.skip ? parseInt(req.body.skip) : 0;
+  let blogs;
+  let categories;
+  let tags;
+  Blog.find({})
+  .populate('categories', '_id name slug')  
+  .populate('tags', '_id name slug')
+  .populate('postedBy', '_id name userName profile')
+  .sort({ createdAt: -1 }) // to return latest blog first
+  .skip(skip)
+  .limit(limit)
+  .select('_id title slug excerpt categories tags postedBy createdAt updatedAt')
+  .exec((err, data) => {
+    if (err) {
+      return res.json({ error: errorHandler(err) });
+    }
+    blogs = data;
+    Category.find({})
+      .exec((err, data) => {
+        if (err) {
+          return res.json({ error: errorHandler(err) });
+        }
+        categories = data;
+        Tag.find({})
+          .exec((err, data) => {
+            if(err) {
+              return res.json({ error: errorHandler(err) });
+            }
+            tags = data;
+            res.json({ blogs, categories, tags, size: blogs.length });
+          });
+      });
+  });
+};
+
+exports.read = (req,res) => {
+  const slug = req.params.slug.toLowerCase();
+  Blog.findOne({slug})
+    .populate('categories', '_id name slug')  
+    .populate('tags', '_id name slug')
+    .populate('postedBy', '_id name userName')
+    .select('_id title slug body mtitle mdesc categories tags postedBy createdAt updatedAt') 
+    .exec((err, data) => {
+      if (err) {
+        return res.json({ error: errorHandler(err) });
+      }
+      res.json(data);
+    });
+};
+
+exports.remove = (req,res) => {
+  const slug = req.params.slug.toLowerCase();
+  Blog.findOneAndDelete({slug})
+    .exec((err, data) => {
+      if(err) {
+        return res.json({ error: errorHandler(err) });
+      }
+      res.json({ message: "Blog deleted Successfully" });
+    });
+};
+
+exports.update = (req,res) => {
+  const slug = req.params.slug.toLowerCase();
+  Blog.findOne({slug}).exec((err,oldBlog) => {
+    if(err){
+      return res.json({error: errorHandler(err)});
+    }
+    let form = new formidable.IncomingForm();
+    form.keepExtensions = true;
+    form.parse(req, (err, fields, files) => {
+      if (err) {
+        return res.status(400).json({
+          error: "Image could not upload"
+        });
+      }
+      let slugBeforeMerge = oldBlog.slug;
+      oldBlog = _.merge(oldBlog, fields);
+      oldBlog.slug = slugBeforeMerge;
+      const {body, desc, categories, tags} = fields;
+      if (body) {
+        oldBlog.excerpt = smartTrim(body, 320, " ", " ...");
+        oldBlog.desc = stripHtml(body.substring(0,160));
+      }
+      if (categories) {
+        oldBlog.categories = categories.split(",");
+      }
+      if (tags) {
+        oldBlog.tags = tags.split(",");
+      }
+      if (files.photo) {
+        if (files.photo.size > 10000000) { 
+          return res.status(400).json({
+            error: "Image size should be less than 1MB"
+          });
+        }
+        oldBlog.photo.data = fs.readFileSync(files.photo.path);
+        oldBlog.photo.contentType = files.photo.type;
+      }
+      oldBlog.save((err,result) => {
+        if(err) {
+          return res.status(400).json({ error: errorHandler(err) });
+        }
+        //result.photo = undefined; if you don't want to send photo
+        res.json(result);
+      });
+    });
+  });
+};
+
+exports.photo = (req, res) => {
+    const slug = req.params.slug.toLowerCase();
+    Blog.findOne({slug}).select("photo").exec((err,blog) => {
+      if(err || !blog) {
+        return res.status(400).json({ error: errorHandler(err) });
+      }
+      res.set("Content-Type", blog.photo.contentType);
+      return res.send(blog.photo.data);
+    });
+};
+
+exports.listRelated = (req, res) => {
+  let limit = req.body.limit ? parseInt(req.body.limit) : 3;
+  const {_id, categories} = req.body.blog;
+  Blog.find({_id: {$ne:_id}, categories:{$in: categories}})
+    .limit(limit)
+    .populate("postedBy", "_id name profile")
+    .select("title slug excerpt postedBy createdAt updatedAt")
+    .exec((err, blogs) => {
+      if(err) {
+        return res.status(400).json({ error: "Blogs not found." });
+      }
+      res.json(blogs);
+    });
+};
+

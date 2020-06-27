@@ -60,6 +60,11 @@ const Header = props => {
                     <NavLink style={{ cursor: "pointer" }}>Sign Up</NavLink>
                   </Link>
                 </NavItem>
+                <NavItem>
+                  <Link href="/blogs">
+                    <NavLink style={{ cursor: "pointer" }}>Blogs</NavLink>
+                  </Link>
+                </NavItem>
               </React.Fragment>
             )}
           </Nav>

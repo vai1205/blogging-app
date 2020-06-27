@@ -25,6 +25,7 @@ export const signin = user => {
     .then(resp => resp.json())
     .catch(err => console.log(err));
 };
+
 export const signout = next => {
   removeCookie("token");
   removeLocalStorage("user");

@@ -70,7 +70,7 @@ exports.authMiddleWare = (req, res, next) => {
     if (err || !user) {
       res.status(400).json({
         error: "User not found!"
-      });
+      });  
     }
     req.profile = user;
     next();

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Schema;
 const blogSchema = new mongoose.Schema(
   {
-    title: {
+    title: { 
       type: String,
       trim: true,
       min: 3,
@@ -35,25 +35,14 @@ const blogSchema = new mongoose.Schema(
       data: Buffer,
       contentType: String
     },
-    categories: [
-      {
-        type: ObjectId,
-        ref: "Category",
-        required: true
-      }
-    ],
-    tags: [
-      {
-        type: ObjectId,
-        ref: "Tag",
-        required: true
-      }
-    ],
-    postedBy: {
-      type: ObjectId,
-      ref: "User"
-    }
+
+    categories: [ { type: ObjectId, ref: "Category", required: true } ],
+
+    tags: [ { type: ObjectId, ref: "Tag", required: true } ],
+
+    postedBy: { type: ObjectId, ref: "User" }
   },
+  
   { timestamps: true }
 );
 
