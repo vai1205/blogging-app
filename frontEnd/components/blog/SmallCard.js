@@ -6,7 +6,7 @@ import {API} from "../../config";
 
 const SmallCard = ({blog}) => {
     return (
-        <div className="card">
+        <div className="card mb-5">
             <section>
                 <Link href={`/blogs/${blog.slug}`}>
                     <a>
@@ -32,10 +32,13 @@ const SmallCard = ({blog}) => {
                 </section>
             </div>
             <div className="card-body">
-                <Link href={`/blogs/${blog.slug}`}>
+                <Link href={`/blogs/${blog.slug}`} className="mb-3">
                     <a className="btn btn-primary pt-2">Read More</a>
                 </Link>
+                <br/>
+                <div className="mt-3">
                 Posted {moment(blog.updatedAt).fromNow()} by {blog.postedBy.name}
+                </div>
             </div>
         </div>
     );
