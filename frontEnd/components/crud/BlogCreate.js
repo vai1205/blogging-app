@@ -44,7 +44,7 @@ const CreateBlog = ({ router }) => {
     setValues({ ...values, formData: new FormData() });
     initCategories();
     initTags();
-  }, [router]);
+  }, [router, success]);
   const initCategories = () => {
     getCategories().then(resp => {
       if (resp.error) {

@@ -3,7 +3,7 @@ import Link from "next/link";
 import Router from "next/router";
 import { withRouter } from "next/router";
 import dynamic from "next/dynamic";
-import { singleBlog, updateBlog } from "../../actions/blog";
+import { singleBlog, updateBlog, blogImageUrl } from "../../actions/blog";
 import { getCookie, isAuth } from "../../actions/auth";
 import { getCategories } from "../../actions/category";
 import { getTags } from "../../actions/tag";
@@ -13,7 +13,7 @@ import {QuillModules, QuillFormats} from "../../helpers/quill";
 import { API } from "../../config";
 
 const BlogUpdate = ({router}) => {
-// todo : change image preview once image is changed and track edited title and body in local storage
+// todo : add loaders on API calls and track edited title and body in local storage
     const [title, setTitle] = useState('');
     const [body, setBody] = useState('');
     const [categories, setCategories] = useState([]);
@@ -56,8 +56,11 @@ const BlogUpdate = ({router}) => {
 
     const findImagePath = slug => {
         if(slug) {
-            let path = `${API}/blog/photo/${slug}`
-            setImagePath(path);
+            blogImageUrl(slug).then(resp=>{
+                if(resp){
+                    setImagePath(resp);
+                }
+            })
         }
     };
 
@@ -116,6 +119,9 @@ const BlogUpdate = ({router}) => {
         if (name === 'title') {
             setTitle(value)
         }
+        if (name === 'photo') {
+            editBlog(null, true);
+        }
     };
 
     const handleBody = e => {
@@ -151,16 +157,20 @@ const BlogUpdate = ({router}) => {
         formData.set("tags", all);
     };
 
-    const editBlog = e => {
-        e.preventDefault();
+    const editBlog = (e, isReloadOnSave) => {
+        e && e.preventDefault();
         let slug = router.query.slug;
         if(slug){
             updateBlog(formData, token, slug).then(resp => {
                 if (resp.error){
                     setValues({...values, error:resp.error});
                 } else {
-                    setValues({...values, success:resp.message});
-                    window.location.reload();
+                    setValues({...values, success:"Blog Updated!"});
+                    if(isReloadOnSave){
+                        window.location.reload();
+                    } else {
+                        window.scrollTo(0,document.body.scrollHeight);
+                    }
                 }
             })
         }
@@ -189,7 +199,7 @@ const BlogUpdate = ({router}) => {
               />
             </div>
             <div>
-              <button className="btn btn-primary" type="submit">
+              <button className="btn btn-primary mb-5" type="submit">
                 Update
               </button>
             </div>
@@ -236,18 +246,23 @@ const BlogUpdate = ({router}) => {
     );
 
     const showSuccess = () => (
-    <div
-        style={{ display: success ? "" : 'none' }}
-        className="alert alert-success"
-    >
-        {success}
+    <div className="d-flex">
+        <div
+            style={{ display: success ? "" : 'none' }}
+            className="alert alert-success mb-5"
+        >
+            {success}
+            <button className="btn btn-sm btn-outline-dark ml-5" onClick={()=>{router.replace("/admin")}}>
+                Move Back to Dashboard
+            </button>
+        </div>
     </div>
     );
 
     return (
         <>
             <div className="container-fluid">
-                <h4>Update your Creation!</h4>
+                <h4>Enhance your Creation!</h4>
                 <hr />
                 <div className="row">
                     <div className="col-md-8">

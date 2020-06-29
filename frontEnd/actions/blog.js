@@ -82,3 +82,14 @@ export const updateBlog = (blog, token, slug) => {
     .then(resp => {return resp.json()})
     .catch(err => console.log(err));
 };
+
+export const blogImageUrl = slug => {
+  return fetch(`${API}/blog/photo/${slug}`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  })
+  .then(resp => {return resp.url})
+  .catch(err => console.log(err));
+}
