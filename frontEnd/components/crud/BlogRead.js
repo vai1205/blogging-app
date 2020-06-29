@@ -34,7 +34,8 @@ const BlogRead = () => {
                         {b.postedBy.name}
                     </p>
                     <div>
-                        {showDelete(b.slug)}
+                        <span>{showDelete(b.slug)}</span>
+                        <span  className="ml-2">{showUpdate(b)}</span>
                     </div>
                 </section>
             );
@@ -49,6 +50,17 @@ const BlogRead = () => {
                 Delete
             </button>
         );
+    };
+    const showUpdate = blog => {
+        if(isAuth() && isAuth().role === 1){
+            return(
+                <Link href={`/admin/crud/${blog.slug}`}>
+                    <a className="btn btn-sm btn-success">
+                        Update 
+                    </a>
+                </Link>
+            );
+        }
     };
     const confirmDelete = slug => {
         let del = window.confirm("Are you sure you want to delete this blog?");
